@@ -5,262 +5,371 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>占星回測所｜盲測簿</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 :root{
-  --paper:#EFE1B0; --card:#F8F0D6; --ink:#2B2620; --ink-soft:#6E6350;
-  --red:#B7332B; --red-deep:#8E2620; --indigo:#274B6D; --line:#B7A87F;
-  --ok:#3E6B3A;
+  --bg:#FAFAF7; --ink:#161512; --muted:#84806f; --line:#DAD6C6; --card:#FFFFFE;
+  --fill:#161512; --fill-soft:#EDEBE0;
 }
 *{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-tap-highlight-color:transparent}
 body{
-  background:var(--paper); color:var(--ink);
-  font-family:"Noto Sans TC",sans-serif; font-size:15px; line-height:1.7;
-  background-image:repeating-linear-gradient(0deg,transparent,transparent 27px,rgba(43,38,32,.045) 27px,rgba(43,38,32,.045) 28px);
+  background:
+    radial-gradient(circle at 1px 1px, rgba(22,21,18,.08) 1px, transparent 0) 0 0/16px 16px,
+    var(--bg);
+  color:var(--ink); font-family:"Inter",sans-serif; font-size:15px; line-height:1.65;
+  min-height:100vh;
 }
-.wrap{max-width:560px;margin:0 auto;padding:0 16px 80px}
-/* ── 頭版：曆頁日期牌 ── */
-header{display:flex;align-items:stretch;gap:14px;padding:20px 0 14px;border-bottom:3px double var(--ink)}
-.masthead{writing-mode:vertical-rl;font-family:"Noto Serif TC",serif;font-weight:900;font-size:20px;letter-spacing:6px;color:var(--red);border-right:1px solid var(--line);padding-right:10px}
-.dateplate{flex:1}
-.dateplate .num{font-family:"Noto Serif TC",serif;font-weight:900;font-size:46px;line-height:1;color:var(--ink)}
-.dateplate .sub{font-size:13px;color:var(--ink-soft);letter-spacing:2px;margin-top:4px}
-.zodiac-chip{align-self:center;border:1.5px solid var(--indigo);color:var(--indigo);border-radius:4px;padding:3px 10px;font-size:13px;background:none;cursor:pointer;font-family:inherit}
-/* ── 頁籤 ── */
-nav{display:flex;border-bottom:1px solid var(--ink);margin-bottom:18px}
-nav button{flex:1;background:none;border:none;padding:11px 0 9px;font-family:"Noto Serif TC",serif;font-weight:700;font-size:16px;letter-spacing:3px;color:var(--ink-soft);cursor:pointer;border-bottom:3px solid transparent}
-nav button.active{color:var(--red);border-bottom-color:var(--red)}
-/* ── 卡片 ── */
-.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px;margin-bottom:14px;box-shadow:2px 2px 0 rgba(43,38,32,.08)}
-h2{font-family:"Noto Serif TC",serif;font-weight:900;font-size:17px;letter-spacing:2px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-h2::before{content:"";width:8px;height:8px;background:var(--red);display:inline-block}
-.hint{font-size:13px;color:var(--ink-soft)}
-/* ── 評分列 ── */
-.rate-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.mono{font-family:"IBM Plex Mono",monospace}
+.wrap{max-width:600px;margin:0 auto;padding:0 18px 90px}
+a{color:var(--ink)}
+::selection{background:var(--ink);color:var(--bg)}
+
+header{padding:28px 0 16px;border-bottom:1px solid var(--ink)}
+.eyebrow{font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.title-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+h1{font-family:"Newsreader",serif;font-weight:800;font-size:30px;letter-spacing:-.3px}
+.dateplate{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--muted);text-align:right;white-space:nowrap}
+.authbar{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:var(--muted)}
+.authbar .dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.authbar .dot.on{background:var(--ink)}
+.authbar button{background:none;border:none;font:inherit;color:var(--ink);text-decoration:underline;cursor:pointer;padding:0}
+
+nav{display:flex;gap:2px;margin:22px 0 22px;border-bottom:1px solid var(--line)}
+nav button{
+  flex:1;background:none;border:none;padding:11px 4px;font-family:"Inter",sans-serif;font-weight:600;
+  font-size:13px;letter-spacing:.5px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+}
+nav button.active{color:var(--ink);border-bottom-color:var(--ink)}
+
+.card{background:var(--card);border:1px solid var(--line);padding:20px;margin-bottom:16px}
+h2{font-family:"Newsreader",serif;font-weight:700;font-size:18px;margin-bottom:4px}
+.hint{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6}
+
+.rate-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
 .rate-row:last-of-type{border-bottom:none}
-.rate-label{width:3.2em;font-weight:700;letter-spacing:2px}
-.seg{display:flex;gap:5px;flex:1}
-.seg button{flex:1;padding:7px 0;border:1px solid var(--line);background:#fff8;border-radius:3px;font-family:"Noto Serif TC",serif;font-weight:700;color:var(--ink-soft);cursor:pointer}
-.seg button.sel{background:var(--indigo);border-color:var(--indigo);color:#fff}
-textarea{width:100%;border:1px solid var(--line);border-radius:4px;background:#fff8;padding:9px;font-family:inherit;font-size:14px;min-height:64px;margin-top:8px}
-input[type=password],select{width:100%;border:1px solid var(--line);border-radius:4px;background:#fff8;padding:9px;font-family:inherit;font-size:14px}
-.btn{display:block;width:100%;padding:12px;margin-top:12px;border:none;border-radius:4px;background:var(--red);color:#fff;font-family:"Noto Serif TC",serif;font-weight:900;font-size:17px;letter-spacing:6px;cursor:pointer}
-.btn:active{background:var(--red-deep)}
-.btn.secondary{background:none;border:1.5px solid var(--indigo);color:var(--indigo);font-size:14px;letter-spacing:2px;padding:9px}
-.btn:disabled{background:var(--line);cursor:not-allowed}
-/* ── 封緘印 ── */
-.stamp{width:58px;height:58px;border:2.5px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Noto Serif TC",serif;font-weight:900;font-size:24px;color:var(--red);transform:rotate(-8deg);flex-shrink:0;background:radial-gradient(circle,#fff6 0%,transparent 70%)}
-.stamp.open{border-color:var(--ok);color:var(--ok);transform:rotate(4deg)}
-.month-row{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.rate-label{width:3.4em;font-size:13.5px;font-weight:600;color:var(--muted)}
+.seg{display:flex;gap:4px;flex:1}
+.seg button{
+  flex:1;aspect-ratio:1.5;border:1px solid var(--line);background:none;font-family:"IBM Plex Mono",monospace;
+  font-weight:600;color:var(--muted);cursor:pointer;font-size:13px;transition:background .1s,color .1s;
+}
+.seg button.sel{background:var(--fill);border-color:var(--fill);color:var(--bg)}
+textarea,input[type=email],input[type=password],select{
+  width:100%;border:1px solid var(--line);background:var(--bg);padding:10px 11px;font-family:inherit;
+  font-size:14px;color:var(--ink);
+}
+textarea{min-height:64px;margin-top:10px;resize:vertical}
+textarea:focus,input:focus,select:focus{outline:2px solid var(--ink);outline-offset:-1px}
+
+.btn{display:block;width:100%;padding:13px;margin-top:14px;border:1px solid var(--ink);background:var(--ink);
+  color:var(--bg);font-family:"Inter",sans-serif;font-weight:700;font-size:14px;letter-spacing:1.5px;cursor:pointer}
+.btn:active{background:#000}
+.btn.secondary{background:none;color:var(--ink)}
+.btn:disabled{background:var(--line);border-color:var(--line);color:var(--muted);cursor:not-allowed}
+
+.weekstrip{display:flex;gap:6px;margin-top:16px}
+.weekstrip .cell{flex:1;text-align:center}
+.weekstrip .box{width:100%;aspect-ratio:1;border:1px solid var(--ink);margin-bottom:5px;position:relative}
+.weekstrip .box.done::after{content:"";position:absolute;inset:3px;background:var(--ink)}
+.weekstrip .lbl{font-size:10.5px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+
+.month-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}
 .month-row:last-child{border-bottom:none}
+.seal-mark{width:34px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative}
+.seal-mark svg{width:100%;height:100%}
 .month-info{flex:1}
-.month-info .m{font-family:"Noto Serif TC",serif;font-weight:900;font-size:19px}
-.month-info .c{font-size:13px;color:var(--ink-soft)}
-/* ── 開箱項目 ── */
-.item{border-top:2px solid var(--ink);padding:12px 0}
-.item .meta{font-size:12px;color:var(--ink-soft);letter-spacing:1px;margin-bottom:6px}
-.item .txt{white-space:pre-wrap;font-size:14.5px;background:#fff8;border:1px solid var(--line);border-radius:4px;padding:10px;max-height:280px;overflow-y:auto}
-.verdict{display:flex;gap:7px;margin-top:9px}
-.verdict button{flex:1;padding:8px 0;border:1.5px solid var(--line);background:none;border-radius:3px;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--ink-soft);cursor:pointer}
-.verdict button.v-hit.sel{border-color:var(--ok);background:var(--ok);color:#fff}
-.verdict button.v-miss.sel{border-color:var(--red);background:var(--red);color:#fff}
-.verdict button.v-na.sel{border-color:var(--indigo);background:var(--indigo);color:#fff}
-/* ── 統計 ── */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
-.stat{border:1px solid var(--line);border-radius:4px;padding:8px 4px;text-align:center;background:#fff8}
-.stat .v{font-family:"Noto Serif TC",serif;font-weight:900;font-size:22px}
-.stat .l{font-size:11.5px;color:var(--ink-soft);letter-spacing:1px}
-.stat.barnum .v{color:var(--red)}
-.weekstrip{display:flex;gap:5px;margin-top:10px}
-.weekstrip div{flex:1;text-align:center;font-size:11px;color:var(--ink-soft);padding:5px 0;border:1px solid var(--line);border-radius:3px;background:#fff5}
-.weekstrip div.done{background:var(--indigo);color:#fff;border-color:var(--indigo)}
-.pending{font-size:13.5px;padding:8px 0;border-bottom:1px dashed var(--line)}
-.pending a{color:var(--indigo)}
-.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 22px;border-radius:4px;font-size:14px;letter-spacing:2px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9}
+.month-info .m{font-family:"Newsreader",serif;font-weight:700;font-size:16.5px}
+.month-info .c{font-size:12.5px;color:var(--muted);font-family:"IBM Plex Mono",monospace;margin-top:1px}
+
+.item{border-top:1px solid var(--ink);padding:14px 0}
+.item .meta{font-size:11.5px;color:var(--muted);letter-spacing:.5px;margin-bottom:7px;font-family:"IBM Plex Mono",monospace}
+.item .txt{white-space:pre-wrap;font-size:14px;background:var(--bg);border:1px solid var(--line);padding:11px;max-height:280px;overflow-y:auto}
+.verdict{display:flex;gap:6px;margin-top:9px}
+.verdict button{flex:1;padding:8px 0;border:1px solid var(--line);background:none;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
+.verdict button.sel{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin-top:12px}
+.stat{background:var(--card);padding:12px 6px;text-align:center}
+.stat .v{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:22px}
+.stat .l{font-size:10.5px;color:var(--muted);letter-spacing:.5px;margin-top:2px}
+
+.barrow{margin:14px 0}
+.barrow .lbl{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px}
+.barrow .lbl b{font-family:"IBM Plex Mono",monospace;font-weight:600}
+.bartrack{height:8px;background:var(--fill-soft);position:relative}
+.barfill{height:100%;background:var(--ink)}
+.barfill.dim{background:var(--muted)}
+.compare-legend{display:flex;gap:16px;font-size:11.5px;color:var(--muted);margin:-4px 0 12px}
+.compare-legend span::before{content:"";display:inline-block;width:8px;height:8px;margin-right:5px;vertical-align:middle}
+.compare-legend .l1::before{background:var(--ink)}
+.compare-legend .l2::before{background:var(--muted)}
+.divider{border:none;border-top:1px solid var(--line);margin:18px 0}
+.foot-note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+
+.pending{font-size:13.5px;padding:9px 0;border-bottom:1px solid var(--line)}
+.pending:last-child{border-bottom:none}
+.pending a{text-decoration:underline}
+
+#authGate{padding:60px 0}
+#authGate .card{max-width:380px;margin:0 auto}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:var(--bg);
+  padding:10px 22px;font-size:13.5px;letter-spacing:1px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
 .toast.show{opacity:1}
 .hidden{display:none}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="masthead">盲測簿</div>
-    <div class="dateplate">
-      <div class="num" id="hdrDate"></div>
-      <div class="sub" id="hdrSub">占星回測所｜先記錄，月底才開箱</div>
+    <div class="eyebrow">Fortune Research Lab</div>
+    <div class="title-row">
+      <h1>盲測簿</h1>
+      <div class="dateplate" id="hdrDate"></div>
     </div>
-    <button class="zodiac-chip" id="zodiacChip" onclick="pickZodiac()">設定星座</button>
+    <div class="authbar">
+      <span class="dot" id="authDot"></span>
+      <span id="authLabel">尚未登入</span>
+      <button id="authAction" onclick="handleAuthAction()">登入</button>
+    </div>
   </header>
 
-  <nav>
-    <button id="tab-log" class="active" onclick="showTab('log')">今日記錄</button>
-    <button id="tab-vault" onclick="showTab('vault')">封存庫</button>
-    <button id="tab-reveal" onclick="showTab('reveal')">開箱對照</button>
-  </nav>
+  <div id="appBody" class="hidden">
+    <nav>
+      <button id="tab-log" class="active" onclick="showTab('log')">記錄</button>
+      <button id="tab-vault" onclick="showTab('vault')">封存庫</button>
+      <button id="tab-reveal" onclick="showTab('reveal')">開箱</button>
+      <button id="tab-dash" onclick="showTab('dash')">儀表板</button>
+    </nav>
 
-  <!-- 今日記錄 -->
-  <section id="pane-log">
-    <div class="card">
-      <h2>今天過得如何</h2>
-      <p class="hint">憑直覺打分，一分鐘完成。不要去想任何預測——這正是實驗的重點。</p>
-      <div id="rateRows"></div>
-      <textarea id="logNote" placeholder="今天發生的事，中性記錄一到三句（例：跟客戶開會順利、下午頭痛、家人來電）"></textarea>
-      <button class="btn" onclick="saveLog()">記　錄</button>
-      <div class="weekstrip" id="weekStrip"></div>
-    </div>
-    <div class="card">
-      <h2>資料備份</h2>
-      <p class="hint">記錄存在這台裝置的瀏覽器裡。換裝置或清瀏覽器前，記得匯出。</p>
-      <button class="btn secondary" onclick="exportData()">匯出所有記錄（JSON）</button>
-      <button class="btn secondary" onclick="document.getElementById('importFile').click()">匯入備份</button>
-      <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(this)">
-    </div>
-  </section>
+    <section id="pane-log">
+      <div class="card">
+        <h2>今天過得如何</h2>
+        <p class="hint">憑直覺打分，不要去想任何預測——這正是實驗要保護的東西。</p>
+        <div id="rateRows"></div>
+        <textarea id="logNote" placeholder="今天發生的事，中性記錄一到三句"></textarea>
+        <button class="btn" onclick="saveLog()">記　錄</button>
+        <div class="weekstrip" id="weekStrip"></div>
+      </div>
+    </section>
 
-  <!-- 封存庫 -->
-  <section id="pane-vault" class="hidden">
-    <div class="card">
-      <h2>封緘中的預測</h2>
-      <p class="hint">系統每週三自動抓取兩位老師的新預測並加密封存。你看不到內容——連想偷看都不行，這就是盲測。</p>
-      <div id="vaultList"><p class="hint" style="margin-top:10px">載入中……</p></div>
-    </div>
-    <div class="card">
-      <h2>待轉錄的月運直播</h2>
-      <p class="hint">偵測到新的月運勢直播時列在這裡。手動流程：NotebookLM 匯入影片 → 用 PROJECT.md 的轉錄提示詞取得逐字稿。</p>
-      <div id="pendingList"><p class="hint" style="margin-top:10px">目前沒有待辦。</p></div>
-    </div>
-  </section>
+    <section id="pane-vault" class="hidden">
+      <div class="card">
+        <h2>封緘中的預測</h2>
+        <p class="hint">每週三系統自動抓取兩位老師的新預測並加密封存。你看不到內容——連想偷看都不行。</p>
+        <div id="vaultList"></div>
+      </div>
+      <div class="card">
+        <h2>待轉錄的月運直播</h2>
+        <p class="hint">偵測到新月運直播時列在這裡，需手動走 NotebookLM 轉錄流程（該頻道未開放字幕）。</p>
+        <div id="pendingList"><p class="hint">目前沒有待辦。</p></div>
+      </div>
+    </section>
 
-  <!-- 開箱對照 -->
-  <section id="pane-reveal">
-    <div class="card" id="revealSetup">
-      <h2>月底開箱</h2>
-      <p class="hint">選擇一個已結束的月份，輸入封存密碼拆封。逐條判定：命中／未命中／無法驗證——「無法驗證」的比例，就是巴納姆指數。</p>
-      <div style="margin-top:10px">
+    <section id="pane-reveal" class="hidden">
+      <div class="card" id="revealSetup">
+        <h2>月底開箱</h2>
+        <p class="hint">選一個已結束的月份，輸入封存密碼拆封，逐條判定。</p>
         <select id="revealMonth"></select>
+        <input type="password" id="sealKey" placeholder="封存密碼（SEAL_KEY）" style="margin-top:8px">
+        <button class="btn" id="revealBtn" onclick="reveal()">拆　封</button>
       </div>
-      <div style="margin-top:8px">
-        <input type="password" id="sealKey" placeholder="封存密碼（與 GitHub Secret 的 SEAL_KEY 相同）">
+      <div id="revealResult"></div>
+    </section>
+
+    <section id="pane-dash" class="hidden">
+      <div class="card">
+        <h2>你的盲測成績</h2>
+        <p class="hint">跨所有已開箱月份的累計判定。</p>
+        <div id="personalStats"></div>
       </div>
-      <button class="btn" id="revealBtn" onclick="reveal()">拆　封</button>
+      <div class="card">
+        <h2>語料庫研究對照</h2>
+        <p class="hint">來自 636+689+10 筆語料的階段性分析（詳見研究報告 v1.0）。</p>
+
+        <h3 style="font-family:'Newsreader',serif;font-size:14.5px;margin:14px 0 4px">模糊語密度（每千字次數）</h3>
+        <div class="compare-legend">
+          <span class="l1">瑪法達週報</span><span class="l2">唐綺陽週報</span>
+        </div>
+        <div id="hedgeBars"></div>
+
+        <hr class="divider">
+        <h3 style="font-family:'Newsreader',serif;font-size:14.5px;margin-bottom:8px">唐綺陽：週報 vs 直播</h3>
+        <div id="tangCompareBars"></div>
+        <p class="foot-note">完整推理版模糊語較多（猶豫留在推導層），濃縮短評版警示語較多（結論被壓成命令句）。</p>
+
+        <hr class="divider">
+        <h3 style="font-family:'Newsreader',serif;font-size:14.5px;margin-bottom:8px">字面重複率 vs 句型收斂度</h3>
+        <div class="stats" style="grid-template-columns:repeat(2,1fr)">
+          <div class="stat"><div class="v">8.0%</div><div class="l">瑪法達字面重複</div></div>
+          <div class="stat"><div class="v">0.2%</div><div class="l">唐綺陽字面重複</div></div>
+        </div>
+        <p class="foot-note">瑪法達字面重複率低但句型骨架收斂（「一種＿＿」佔29.2%）；唐綺陽字面幾乎不重複，語意層是否收斂待驗證。</p>
+      </div>
+    </section>
+  </div>
+
+  <div id="authGate">
+    <div class="card">
+      <h2>登入盲測簿</h2>
+      <p class="hint">用 email 收一封登入連結，不需要密碼、不需要註冊。跨裝置的記錄都會同步在這裡。</p>
+      <input type="email" id="authEmail" placeholder="你的 email">
+      <button class="btn" onclick="sendMagicLink()">寄送登入連結</button>
+      <p class="hint" id="authGateMsg" style="margin-top:12px"></p>
     </div>
-    <div id="revealResult"></div>
-  </section>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
 "use strict";
-const ZODIAC_NAMES={ARI:"牡羊",TAU:"金牛",GEM:"雙子",CAN:"巨蟹",LEO:"獅子",VIR:"處女",LIB:"天秤",SCO:"天蠍",SAG:"射手",CAP:"魔羯",AQU:"水瓶",PIS:"雙魚"};
 const RATE_FIELDS=[["mood","心情"],["work","工作"],["love","感情"],["money","財務"],["health","健康"]];
-const store={
-  get logs(){return JSON.parse(localStorage.getItem("bt_logs")||"{}")},
-  set logs(v){localStorage.setItem("bt_logs",JSON.stringify(v))},
-  get verdicts(){return JSON.parse(localStorage.getItem("bt_verdicts")||"{}")},
-  set verdicts(v){localStorage.setItem("bt_verdicts",JSON.stringify(v))},
-  get zodiac(){return localStorage.getItem("bt_zodiac")||""},
-  set zodiac(v){localStorage.setItem("bt_zodiac",v)},
+
+const CORPUS = {
+  hedge: {labels:["模糊限定","建議句式","警示提醒"], mafalda:[1.00,1.67,0.80], tangWeekly:[3.20,3.20,5.04]},
+  tangCompare: {labels:["模糊限定","建議句式","警示提醒"], weekly:[3.20,3.20,5.04], live:[5.03,2.11,1.16]},
 };
-let INDEX=null, todayRatings={};
 
-// ── 初始化 ──
+let supabase=null, session=null, todayRatings={}, cachedLogs={}, cachedVerdicts={}, INDEX=null;
+
 const today=new Date(), todayKey=today.toISOString().slice(0,10);
-document.getElementById("hdrDate").textContent=`${today.getMonth()+1}月${today.getDate()}日`;
-document.getElementById("hdrSub").textContent=`星期${"日一二三四五六"[today.getDay()]}｜先記錄，月底才開箱`;
-renderZodiacChip(); renderRateRows(); renderWeekStrip(); loadIndex();
+document.getElementById("hdrDate").textContent=
+  `${today.getFullYear()}/${String(today.getMonth()+1).padStart(2,"0")}/${String(today.getDate()).padStart(2,"0")}　星期${"日一二三四五六"[today.getDay()]}`;
 
-function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1900)}
 function showTab(name){
-  for(const k of["log","vault","reveal"]){
+  for(const k of["log","vault","reveal","dash"]){
     document.getElementById("pane-"+k).classList.toggle("hidden",k!==name);
     document.getElementById("tab-"+k).classList.toggle("active",k===name);
   }
 }
-function pickZodiac(){
-  const input=prompt("你的星座（太陽或上升，用於篩選瑪法達分則）：\n牡羊/金牛/雙子/巨蟹/獅子/處女/天秤/天蠍/射手/魔羯/水瓶/雙魚");
-  if(!input)return;
-  const code=Object.keys(ZODIAC_NAMES).find(k=>ZODIAC_NAMES[k]===input.replace("座","").trim());
-  if(!code){toast("看不懂這個星座名稱");return}
-  store.zodiac=code; renderZodiacChip(); toast("已設定："+ZODIAC_NAMES[code]+"座");
+
+function initSupabase(){
+  const cfg=window.SUPABASE_CONFIG||{};
+  if(!cfg.url||!cfg.anonKey){
+    document.getElementById("authGateMsg").textContent=
+      "尚未設定資料庫連線。請先在 Supabase 建立免費專案，把 Project URL 與 anon key 填入 docs/config.js。";
+    return false;
+  }
+  supabase=window.supabase.createClient(cfg.url,cfg.anonKey);
+  return true;
 }
-function renderZodiacChip(){
-  const c=store.zodiac;
-  document.getElementById("zodiacChip").textContent=c?ZODIAC_NAMES[c]+"座":"設定星座";
+async function checkSession(){
+  if(!supabase)return;
+  const{data}=await supabase.auth.getSession();
+  session=data.session;
+  renderAuthState();
+  if(session){await bootApp()}
+}
+function renderAuthState(){
+  const on=!!session;
+  document.getElementById("authDot").classList.toggle("on",on);
+  document.getElementById("authLabel").textContent=on?session.user.email:"尚未登入";
+  document.getElementById("authAction").textContent=on?"登出":"登入";
+  document.getElementById("appBody").classList.toggle("hidden",!on);
+  document.getElementById("authGate").classList.toggle("hidden",on);
+}
+function handleAuthAction(){
+  if(session){supabase.auth.signOut().then(()=>{session=null;renderAuthState()})}
+  else{document.getElementById("authGate").scrollIntoView({behavior:"smooth"})}
+}
+async function sendMagicLink(){
+  const email=document.getElementById("authEmail").value.trim();
+  if(!email){toast("請輸入 email");return}
+  const{error}=await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:location.href}});
+  document.getElementById("authGateMsg").textContent=error?
+    "寄送失敗："+error.message : `登入連結已寄到 ${email}，請到信箱點連結（含垃圾郵件夾）。`;
 }
 
-// ── 今日記錄 ──
+async function bootApp(){
+  renderRateRows();
+  await Promise.all([loadLogs(),loadVerdicts()]);
+  renderWeekStrip();
+  renderDashboard();
+  loadIndex();
+}
+
 function renderRateRows(){
-  const existing=store.logs[todayKey]||{};
-  todayRatings={...existing.ratings};
-  document.getElementById("logNote").value=existing.note||"";
   const box=document.getElementById("rateRows"); box.innerHTML="";
   for(const[key,label]of RATE_FIELDS){
     const row=document.createElement("div"); row.className="rate-row";
     row.innerHTML=`<span class="rate-label">${label}</span>`;
     const seg=document.createElement("div"); seg.className="seg";
     for(let v=1;v<=5;v++){
-      const b=document.createElement("button"); b.textContent="一二三四五"[v-1];
-      if(todayRatings[key]===v)b.classList.add("sel");
+      const b=document.createElement("button"); b.textContent=v;
       b.onclick=()=>{todayRatings[key]=v;[...seg.children].forEach((x,i)=>x.classList.toggle("sel",i===v-1))};
       seg.appendChild(b);
     }
     row.appendChild(seg); box.appendChild(row);
   }
 }
-function saveLog(){
-  const logs=store.logs;
-  logs[todayKey]={ratings:todayRatings,note:document.getElementById("logNote").value.trim(),saved_at:new Date().toISOString()};
-  store.logs=logs; renderWeekStrip(); toast("已記錄，明天見");
+async function loadLogs(){
+  const{data,error}=await supabase.from("logs").select("*").order("log_date",{ascending:false}).limit(120);
+  if(!error)for(const row of data)cachedLogs[row.log_date]=row;
+  const t=cachedLogs[todayKey];
+  if(t){
+    todayRatings={...t.ratings};document.getElementById("logNote").value=t.note||"";
+    for(const[key,label]of RATE_FIELDS){
+      const v=todayRatings[key]; if(!v)continue;
+      const row=[...document.getElementById("rateRows").children].find(r=>r.querySelector(".rate-label").textContent===label);
+      if(row)[...row.querySelectorAll(".seg button")].forEach((b,i)=>b.classList.toggle("sel",i===v-1));
+    }
+  }
+}
+async function saveLog(){
+  const note=document.getElementById("logNote").value.trim();
+  const{error}=await supabase.from("logs").upsert({log_date:todayKey,ratings:todayRatings,note},{onConflict:"user_id,log_date"});
+  if(error){toast("儲存失敗："+error.message);return}
+  cachedLogs[todayKey]={log_date:todayKey,ratings:{...todayRatings},note};
+  renderWeekStrip(); toast("已記錄，明天見");
 }
 function renderWeekStrip(){
   const strip=document.getElementById("weekStrip"); strip.innerHTML="";
-  const logs=store.logs;
   for(let i=6;i>=0;i--){
     const d=new Date(today); d.setDate(d.getDate()-i);
     const key=d.toISOString().slice(0,10);
-    const cell=document.createElement("div");
-    cell.textContent=`${d.getMonth()+1}/${d.getDate()}`;
-    if(logs[key])cell.classList.add("done");
+    const cell=document.createElement("div"); cell.className="cell";
+    cell.innerHTML=`<div class="box${cachedLogs[key]?" done":""}"></div><div class="lbl">${d.getMonth()+1}/${d.getDate()}</div>`;
     strip.appendChild(cell);
   }
 }
-function exportData(){
-  const blob=new Blob([JSON.stringify({logs:store.logs,verdicts:store.verdicts,zodiac:store.zodiac,exported_at:new Date().toISOString()},null,1)],{type:"application/json"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
-  a.download=`盲測簿備份-${todayKey}.json`; a.click();
+
+async function loadVerdicts(){
+  const{data,error}=await supabase.from("verdicts").select("*");
+  if(!error)for(const row of data)cachedVerdicts[row.item_id]=row;
 }
-function importData(input){
-  const file=input.files[0]; if(!file)return;
-  file.text().then(t=>{
-    const d=JSON.parse(t);
-    if(d.logs)store.logs={...store.logs,...d.logs};
-    if(d.verdicts)store.verdicts={...store.verdicts,...d.verdicts};
-    if(d.zodiac)store.zodiac=d.zodiac;
-    renderRateRows();renderWeekStrip();renderZodiacChip();toast("匯入完成");
-  }).catch(()=>toast("檔案格式不正確"));
+async function saveVerdict(itemId,month,verdict){
+  const{error}=await supabase.from("verdicts").upsert({item_id:itemId,month,verdict},{onConflict:"user_id,item_id"});
+  if(error){toast("判定儲存失敗");return}
+  cachedVerdicts[itemId]={item_id:itemId,month,verdict};
 }
 
-// ── 封存庫 ──
 async function loadIndex(){
   try{
     const resp=await fetch("data/sealed/index.json",{cache:"no-store"});
     if(!resp.ok)throw new Error();
     INDEX=await resp.json();
   }catch{
-    document.getElementById("vaultList").innerHTML=`<p class="hint" style="margin-top:10px">還沒有封存資料。第一次使用請先到 GitHub repo 的 Actions 頁面手動執行一次 weekly-archive。</p>`;
+    document.getElementById("vaultList").innerHTML=`<p class="hint">還沒有封存資料。到 GitHub repo 的 Actions 頁面手動執行一次 weekly-archive。</p>`;
     return;
   }
   renderVault(); renderMonthOptions(); renderPending();
 }
-function monthsInIndex(){
-  const set=new Set(INDEX.items.map(it=>it.month));
-  return[...set].sort();
+function monthsInIndex(){return[...new Set(INDEX.items.map(it=>it.month))].sort()}
+function sealSvg(sealed){
+  return sealed
+    ? `<svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="var(--ink)" stroke-width="1.5"/><circle cx="17" cy="17" r="15" fill="var(--ink)"/></svg>`
+    : `<svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="15" fill="none" stroke="var(--ink)" stroke-width="1.5"/></svg>`;
 }
 function renderVault(){
   const box=document.getElementById("vaultList"); box.innerHTML="";
   const months=monthsInIndex();
-  if(!months.length){box.innerHTML=`<p class="hint" style="margin-top:10px">封存庫是空的——等第一個週三，或到 Actions 手動執行。</p>`;return}
+  if(!months.length){box.innerHTML=`<p class="hint">封存庫是空的——等第一個週三，或到 Actions 手動執行。</p>`;return}
   const curMonth=todayKey.slice(0,7);
   for(const m of months){
     const items=INDEX.items.filter(it=>it.month===m);
@@ -268,7 +377,7 @@ function renderVault(){
     const nTang=items.filter(it=>it.author==="tang").length;
     const sealed=m>=curMonth;
     const row=document.createElement("div"); row.className="month-row";
-    row.innerHTML=`<div class="stamp ${sealed?"":"open"}">${sealed?"封":"啟"}</div>
+    row.innerHTML=`<div class="seal-mark">${sealSvg(sealed)}</div>
       <div class="month-info"><div class="m">${m.replace("-","年")}月</div>
       <div class="c">瑪法達 ${nMfd} 則・唐綺陽 ${nTang} 則${sealed?"・封緘中":"・可開箱"}</div></div>`;
     box.appendChild(row);
@@ -279,28 +388,24 @@ function renderMonthOptions(){
   const curMonth=todayKey.slice(0,7);
   const openable=monthsInIndex().filter(m=>m<curMonth);
   if(!openable.length){
-    sel.innerHTML=`<option>尚無可開箱的月份（本月結束後解鎖）</option>`;
+    sel.innerHTML=`<option>尚無可開箱的月份</option>`;
     document.getElementById("revealBtn").disabled=true; return;
   }
   document.getElementById("revealBtn").disabled=false;
   for(const m of openable.reverse()){
-    const o=document.createElement("option"); o.value=m; o.textContent=m.replace("-","年")+"月";
-    sel.appendChild(o);
+    const o=document.createElement("option"); o.value=m; o.textContent=m.replace("-","年")+"月"; sel.appendChild(o);
   }
 }
 function renderPending(){
-  const box=document.getElementById("pendingList");
-  const p=INDEX.pending_transcripts||[];
-  if(!p.length)return;
-  box.innerHTML="";
+  const box=document.getElementById("pendingList"); const p=INDEX.pending_transcripts||[];
+  if(!p.length)return; box.innerHTML="";
   for(const v of p){
     const div=document.createElement("div"); div.className="pending";
-    div.innerHTML=`★ <a href="${v.url}" target="_blank" rel="noopener">${v.title}</a><br><span class="hint">${v.published}・${v.status}</span>`;
+    div.innerHTML=`<a href="${v.url}" target="_blank" rel="noopener">${v.title}</a><br><span class="hint">${v.published}・${v.status}</span>`;
     box.appendChild(div);
   }
 }
 
-// ── 解密 ──
 async function unseal(sealed,passphrase){
   const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
   const keyMaterial=await crypto.subtle.importKey("raw",new TextEncoder().encode(passphrase),"PBKDF2",false,["deriveKey"]);
@@ -310,15 +415,11 @@ async function unseal(sealed,passphrase){
   const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(sealed.nonce)},key,b64(sealed.ct));
   return new TextDecoder().decode(pt);
 }
-
-// ── 開箱 ──
 async function reveal(){
   const month=document.getElementById("revealMonth").value;
   const pass=document.getElementById("sealKey").value;
   if(!pass){toast("請輸入封存密碼");return}
-  const myZodiac=store.zodiac;
-  const items=INDEX.items.filter(it=>it.month===month&&(it.zodiac==="ALL"||!myZodiac||it.zodiac===myZodiac))
-    .sort((a,b)=>a.period_start.localeCompare(b.period_start));
+  const items=INDEX.items.filter(it=>it.month===month).sort((a,b)=>a.period_start.localeCompare(b.period_start));
   const box=document.getElementById("revealResult");
   box.innerHTML=`<div class="card"><h2>${month.replace("-","年")}月開箱</h2><p class="hint">解密中……</p></div>`;
   const results=[];
@@ -326,37 +427,34 @@ async function reveal(){
     try{
       const resp=await fetch("data/sealed/"+it.path,{cache:"no-store"});
       const rec=await resp.json();
-      const text=await unseal(rec.sealed,pass);
-      results.push({...it,text});
-    }catch(e){
-      box.innerHTML=`<div class="card"><h2>拆封失敗</h2><p class="hint">密碼不正確，或封存檔讀取失敗。確認輸入的密碼與 GitHub Secret 的 SEAL_KEY 完全一致。</p></div>`;
+      results.push({...it,text:await unseal(rec.sealed,pass)});
+    }catch{
+      box.innerHTML=`<div class="card"><h2>拆封失敗</h2><p class="hint">密碼不正確，或封存檔讀取失敗。</p></div>`;
       return;
     }
   }
   renderRevealed(month,results);
 }
 function renderRevealed(month,results){
-  const box=document.getElementById("revealResult");
-  box.innerHTML="";
+  const box=document.getElementById("revealResult"); box.innerHTML="";
   const card=document.createElement("div"); card.className="card";
   card.innerHTML=`<h2>${month.replace("-","年")}月開箱（${results.length} 則）</h2>
-    <p class="hint">對照當月的每日記錄，逐條判定。判定完往下看統計。</p><div id="statsBox"></div>`;
-  const verdicts=store.verdicts;
+    <p class="hint">對照當月的每日記錄，逐條判定。</p><div id="statsBox"></div>`;
   for(const r of results){
     const item=document.createElement("div"); item.className="item";
     const who=r.author==="mafalda"?"瑪法達":"唐綺陽";
-    const z=r.zodiac==="ALL"?"全星座週報":ZODIAC_NAMES[r.zodiac]+"座";
-    item.innerHTML=`<div class="meta">${who}・${z}・${r.period_start}〜${r.period_end}</div>
+    const z=r.zodiac==="ALL"?"全星座週報":r.zodiac;
+    item.innerHTML=`<div class="meta">${who}／${z}／${r.period_start}〜${r.period_end}</div>
       <div class="txt">${r.text.replace(/</g,"&lt;")}</div>`;
     const vd=document.createElement("div"); vd.className="verdict";
-    const cur=verdicts[r.id]?.verdict;
-    for(const[val,label,cls]of[["hit","命中","v-hit"],["miss","未命中","v-miss"],["na","無法驗證","v-na"]]){
-      const b=document.createElement("button"); b.textContent=label; b.className=cls;
+    const cur=cachedVerdicts[r.id]?.verdict;
+    for(const[val,label]of[["hit","命中"],["miss","未命中"],["na","無法驗證"]]){
+      const b=document.createElement("button"); b.textContent=label;
       if(cur===val)b.classList.add("sel");
-      b.onclick=()=>{
-        const v=store.verdicts; v[r.id]={verdict:val,month}; store.verdicts=v;
+      b.onclick=async()=>{
+        await saveVerdict(r.id,month,val);
         [...vd.children].forEach(x=>x.classList.remove("sel")); b.classList.add("sel");
-        renderStats(month,results);
+        renderStats(month,results); renderDashboard();
       };
       vd.appendChild(b);
     }
@@ -365,25 +463,60 @@ function renderRevealed(month,results){
   box.appendChild(card); renderStats(month,results);
 }
 function renderStats(month,results){
-  const verdicts=store.verdicts;
   let hit=0,miss=0,na=0;
   for(const r of results){
-    const v=verdicts[r.id]?.verdict;
+    const v=cachedVerdicts[r.id]?.verdict;
     if(v==="hit")hit++; else if(v==="miss")miss++; else if(v==="na")na++;
   }
-  const judged=hit+miss+na;
-  const verifiable=hit+miss;
+  const judged=hit+miss+na, verifiable=hit+miss;
   const hitRate=verifiable?Math.round(hit/verifiable*100):0;
   const barnum=judged?Math.round(na/judged*100):0;
-  document.getElementById("statsBox").innerHTML=judged?`
-    <div class="stats">
+  const box=document.getElementById("statsBox"); if(!box)return;
+  box.innerHTML=judged?`<div class="stats">
       <div class="stat"><div class="v">${judged}/${results.length}</div><div class="l">已判定</div></div>
       <div class="stat"><div class="v">${hit}</div><div class="l">命中</div></div>
       <div class="stat"><div class="v">${hitRate}%</div><div class="l">可驗證命中率</div></div>
-      <div class="stat barnum"><div class="v">${barnum}%</div><div class="l">巴納姆指數</div></div>
-    </div>
-    <p class="hint" style="margin-top:8px">巴納姆指數＝「無法驗證」佔已判定的比例。這個數字本身就是研究發現。</p>`:"";
+      <div class="stat"><div class="v">${barnum}%</div><div class="l">巴納姆指數</div></div>
+    </div><p class="foot-note">巴納姆指數＝「無法驗證」佔已判定的比例。</p>`:"";
 }
+
+function bar(label,val,max,dim){
+  return `<div class="barrow"><div class="lbl"><span>${label}</span><b>${val.toFixed(2)}</b></div>
+    <div class="bartrack"><div class="barfill${dim?" dim":""}" style="width:${Math.min(100,val/max*100)}%"></div></div></div>`;
+}
+function renderDashboard(){
+  let hit=0,miss=0,na=0;
+  for(const v of Object.values(cachedVerdicts)){
+    if(v.verdict==="hit")hit++; else if(v.verdict==="miss")miss++; else if(v.verdict==="na")na++;
+  }
+  const judged=hit+miss+na, verifiable=hit+miss;
+  const nLogs=Object.keys(cachedLogs).length;
+  const box=document.getElementById("personalStats");
+  box.innerHTML=judged?`<div class="stats">
+      <div class="stat"><div class="v">${nLogs}</div><div class="l">累計記錄天數</div></div>
+      <div class="stat"><div class="v">${judged}</div><div class="l">累計已判定</div></div>
+      <div class="stat"><div class="v">${verifiable?Math.round(hit/verifiable*100):0}%</div><div class="l">命中率</div></div>
+      <div class="stat"><div class="v">${judged?Math.round(na/judged*100):0}%</div><div class="l">巴納姆指數</div></div>
+    </div>`:`<p class="hint">還沒有開箱資料。累計記錄天數：<span class="mono">${nLogs}</span> 天。</p>`;
+
+  const maxHedge=Math.max(...CORPUS.hedge.mafalda,...CORPUS.hedge.tangWeekly);
+  document.getElementById("hedgeBars").innerHTML=CORPUS.hedge.labels.map((lbl,i)=>
+    bar(lbl+"／瑪法達",CORPUS.hedge.mafalda[i],maxHedge,false)+
+    bar(lbl+"／唐綺陽",CORPUS.hedge.tangWeekly[i],maxHedge,true)
+  ).join("");
+
+  const maxTang=Math.max(...CORPUS.tangCompare.weekly,...CORPUS.tangCompare.live);
+  document.getElementById("tangCompareBars").innerHTML=CORPUS.tangCompare.labels.map((lbl,i)=>
+    bar(lbl+"／週報",CORPUS.tangCompare.weekly[i],maxTang,false)+
+    bar(lbl+"／直播",CORPUS.tangCompare.live[i],maxTang,true)
+  ).join("");
+}
+
+(async function start(){
+  if(!initSupabase())return;
+  await checkSession();
+  supabase.auth.onAuthStateChange((_evt,sess)=>{session=sess;renderAuthState();if(sess)bootApp()});
+})();
 </script>
 </body>
 </html>
