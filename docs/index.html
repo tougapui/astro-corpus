@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>占星回測所｜盲測簿</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;600;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --bg:#FAFAF7; --ink:#161512; --muted:#84806f; --line:#DAD6C6; --card:#FFFFFE;
@@ -235,7 +236,7 @@ const CORPUS = {
   tangCompare: {labels:["模糊限定","建議句式","警示提醒"], weekly:[3.20,3.20,5.04], live:[5.03,2.11,1.16]},
 };
 
-let supabase=null, session=null, todayRatings={}, cachedLogs={}, cachedVerdicts={}, INDEX=null;
+let sb=null, session=null, todayRatings={}, cachedLogs={}, cachedVerdicts={}, INDEX=null;
 
 const today=new Date(), todayKey=today.toISOString().slice(0,10);
 document.getElementById("hdrDate").textContent=
@@ -256,12 +257,22 @@ function initSupabase(){
       "尚未設定資料庫連線。請先在 Supabase 建立免費專案，把 Project URL 與 anon key 填入 docs/config.js。";
     return false;
   }
-  supabase=window.supabase.createClient(cfg.url,cfg.anonKey);
+  if(!window.supabase||typeof window.supabase.createClient!=="function"){
+    document.getElementById("authGateMsg").textContent=
+      "Supabase 函式庫載入失敗（可能是網路問題或CDN連結失效），請重新整理頁面再試一次。";
+    return false;
+  }
+  try{
+    sb=window.supabase.createClient(cfg.url,cfg.anonKey);
+  }catch(e){
+    document.getElementById("authGateMsg").textContent="資料庫連線初始化失敗："+e.message;
+    return false;
+  }
   return true;
 }
 async function checkSession(){
-  if(!supabase)return;
-  const{data}=await supabase.auth.getSession();
+  if(!sb)return;
+  const{data}=await sb.auth.getSession();
   session=data.session;
   renderAuthState();
   if(session){await bootApp()}
@@ -275,15 +286,20 @@ function renderAuthState(){
   document.getElementById("authGate").classList.toggle("hidden",on);
 }
 function handleAuthAction(){
-  if(session){supabase.auth.signOut().then(()=>{session=null;renderAuthState()})}
+  if(session){sb.auth.signOut().then(()=>{session=null;renderAuthState()})}
   else{document.getElementById("authGate").scrollIntoView({behavior:"smooth"})}
 }
 async function sendMagicLink(){
   const email=document.getElementById("authEmail").value.trim();
   if(!email){toast("請輸入 email");return}
-  const{error}=await supabase.auth.signInWithOtp({email,options:{emailRedirectTo:location.href}});
-  document.getElementById("authGateMsg").textContent=error?
-    "寄送失敗："+error.message : `登入連結已寄到 ${email}，請到信箱點連結（含垃圾郵件夾）。`;
+  if(!sb){document.getElementById("authGateMsg").textContent="資料庫尚未連線，請重新整理頁面。";return}
+  try{
+    const{error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.href}});
+    document.getElementById("authGateMsg").textContent=error?
+      "寄送失敗："+error.message : `登入連結已寄到 ${email}，請到信箱點連結（含垃圾郵件夾）。`;
+  }catch(e){
+    document.getElementById("authGateMsg").textContent="寄送失敗："+e.message;
+  }
 }
 
 async function bootApp(){
@@ -309,7 +325,7 @@ function renderRateRows(){
   }
 }
 async function loadLogs(){
-  const{data,error}=await supabase.from("logs").select("*").order("log_date",{ascending:false}).limit(120);
+  const{data,error}=await sb.from("logs").select("*").order("log_date",{ascending:false}).limit(120);
   if(!error)for(const row of data)cachedLogs[row.log_date]=row;
   const t=cachedLogs[todayKey];
   if(t){
@@ -323,7 +339,7 @@ async function loadLogs(){
 }
 async function saveLog(){
   const note=document.getElementById("logNote").value.trim();
-  const{error}=await supabase.from("logs").upsert({log_date:todayKey,ratings:todayRatings,note},{onConflict:"user_id,log_date"});
+  const{error}=await sb.from("logs").upsert({log_date:todayKey,ratings:todayRatings,note},{onConflict:"user_id,log_date"});
   if(error){toast("儲存失敗："+error.message);return}
   cachedLogs[todayKey]={log_date:todayKey,ratings:{...todayRatings},note};
   renderWeekStrip(); toast("已記錄，明天見");
@@ -340,11 +356,11 @@ function renderWeekStrip(){
 }
 
 async function loadVerdicts(){
-  const{data,error}=await supabase.from("verdicts").select("*");
+  const{data,error}=await sb.from("verdicts").select("*");
   if(!error)for(const row of data)cachedVerdicts[row.item_id]=row;
 }
 async function saveVerdict(itemId,month,verdict){
-  const{error}=await supabase.from("verdicts").upsert({item_id:itemId,month,verdict},{onConflict:"user_id,item_id"});
+  const{error}=await sb.from("verdicts").upsert({item_id:itemId,month,verdict},{onConflict:"user_id,item_id"});
   if(error){toast("判定儲存失敗");return}
   cachedVerdicts[itemId]={item_id:itemId,month,verdict};
 }
@@ -515,7 +531,7 @@ function renderDashboard(){
 (async function start(){
   if(!initSupabase())return;
   await checkSession();
-  supabase.auth.onAuthStateChange((_evt,sess)=>{session=sess;renderAuthState();if(sess)bootApp()});
+  sb.auth.onAuthStateChange((_evt,sess)=>{session=sess;renderAuthState();if(sess)bootApp()});
 })();
 </script>
 </body>
