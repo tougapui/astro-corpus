@@ -1,0 +1,36 @@
+name: weekly-archive
+
+on:
+  schedule:
+    # 每週三 02:00 UTC（台北時間 10:00）——瑪法達週二發布、唐綺陽週日發布，週三一次收齊
+    - cron: "0 2 * * 3"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run archive script
+        env:
+          SEAL_KEY: ${{ secrets.SEAL_KEY }}
+        run: python scripts/archive_weekly.py
+
+      - name: Commit sealed data
+        run: |
+          git config user.name "seal-bot"
+          git config user.email "seal-bot@users.noreply.github.com"
+          git add docs/data/sealed
+          git diff --cached --quiet || git commit -m "封存：$(date -u +%Y-%m-%d) 自動更新"
+          git push
