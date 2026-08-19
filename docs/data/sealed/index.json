@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-08-12T03:53:58+00:00",
+ "updated_at": "2026-08-19T02:48:13+00:00",
  "items": [
   {
    "id": "MFD-W-20260714-ARI",
@@ -190,6 +190,16 @@
    "zodiac": "ALL",
    "period_start": "2026-08-10",
    "period_end": "2026-08-16"
+  },
+  {
+   "id": "TANG-W-20260817-ALL",
+   "path": "2026-08/TANG-W-20260817-ALL.json",
+   "month": "2026-08",
+   "author": "tang",
+   "cycle": "weekly",
+   "zodiac": "ALL",
+   "period_start": "2026-08-17",
+   "period_end": "2026-08-23"
   }
  ],
  "pending_transcripts": []
