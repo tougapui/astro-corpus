@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-04T08:14:56+00:00",
+ "updated_at": "2026-11-11T08:33:06+00:00",
  "items": [
   {
    "id": "MFD-W-20260714-ARI",
@@ -420,6 +420,136 @@
    "zodiac": "ALL",
    "period_start": "2026-11-02",
    "period_end": "2026-11-08"
+  },
+  {
+   "id": "MFD-W-20261110-ARI",
+   "path": "2026-11/MFD-W-20261110-ARI.json",
+   "month": "2026-11",
+   "author": "mafalda",
+   "cycle": "weekly",
+   "zodiac": "ARI",
+   "period_start": "2026-11-11",
+   "period_end": "2026-11-17"
+  },
+  {
+   "id": "MFD-W-20261110-TAU",
+   "path": "2026-11/MFD-W-20261110-TAU.json",
+   "month": "2026-11",
+   "author": "mafalda",
+   "cycle": "weekly",
+   "zodiac": "TAU",
+   "period_start": "2026-11-11",
+   "period_end": "2026-11-17"
+  },
+  {
+   "id": "MFD-W-20261110-GEM",
+   "path": "2026-11/MFD-W-20261110-GEM.json",
+   "month": "2026-11",
+   "author": "mafalda",
+   "cycle": "weekly",
+   "zodiac": "GEM",
+   "period_start": "2026-11-11",
+   "period_end": "2026-11-17"
+  },
+  {
+   "id": "MFD-W-20261110-CAN",
+   "path": "2026-11/MFD-W-20261110-CAN.json",
+   "month": "2026-11",
+   "author": "mafalda",
+   "cycle": "weekly",
+   "zodiac": "CAN",
+   "period_start": "2026-11-11",
+   "period_end": "2026-11-17"
+  },
+  {
+   "id": "MFD-W-20261110-LEO",
+   "path": "2026-11/MFD-W-20261110-LEO.json",
+   "month": "2026-11",
+   "author": "mafalda",
+   "cycle": "weekly",
+   "zodiac": "LEO",
+   "period_start": "2026-11-11",
+   "period_end": "2026-11-17"
+  },
+  {
+   "id": "MFD-W-20261110-VIR",
+   "path": "2026-11/MFD-W-20261110-VIR.json",
+   "month": "2026-11",
+   "author": "mafalda",
+   "cycle": "weekly",
+   "zodiac": "VIR",
+   "period_start": "2026-11-11",
+   "period_end": "2026-11-17"
+  },
+  {
+   "id": "MFD-W-20261110-LIB",
+   "path": "2026-11/MFD-W-20261110-LIB.json",
+   "month": "2026-11",
+   "author": "mafalda",
+   "cycle": "weekly",
+   "zodiac": "LIB",
+   "period_start": "2026-11-11",
+   "period_end": "2026-11-17"
+  },
+  {
+   "id": "MFD-W-20261110-SCO",
+   "path": "2026-11/MFD-W-20261110-SCO.json",
+   "month": "2026-11",
+   "author": "mafalda",
+   "cycle": "weekly",
+   "zodiac": "SCO",
+   "period_start": "2026-11-11",
+   "period_end": "2026-11-17"
+  },
+  {
+   "id": "MFD-W-20261110-SAG",
+   "path": "2026-11/MFD-W-20261110-SAG.json",
+   "month": "2026-11",
+   "author": "mafalda",
+   "cycle": "weekly",
+   "zodiac": "SAG",
+   "period_start": "2026-11-11",
+   "period_end": "2026-11-17"
+  },
+  {
+   "id": "MFD-W-20261110-CAP",
+   "path": "2026-11/MFD-W-20261110-CAP.json",
+   "month": "2026-11",
+   "author": "mafalda",
+   "cycle": "weekly",
+   "zodiac": "CAP",
+   "period_start": "2026-11-11",
+   "period_end": "2026-11-17"
+  },
+  {
+   "id": "MFD-W-20261110-AQU",
+   "path": "2026-11/MFD-W-20261110-AQU.json",
+   "month": "2026-11",
+   "author": "mafalda",
+   "cycle": "weekly",
+   "zodiac": "AQU",
+   "period_start": "2026-11-11",
+   "period_end": "2026-11-17"
+  },
+  {
+   "id": "MFD-W-20261110-PIS",
+   "path": "2026-11/MFD-W-20261110-PIS.json",
+   "month": "2026-11",
+   "author": "mafalda",
+   "cycle": "weekly",
+   "zodiac": "PIS",
+   "period_start": "2026-11-11",
+   "period_end": "2026-11-17"
+  },
+  {
+   "id": "TANG-W-20261109-ALL",
+   "path": "2026-11/TANG-W-20261109-ALL.json",
+   "month": "2026-11",
+   "author": "tang",
+   "cycle": "weekly",
+   "zodiac": "ALL",
+   "period_start": "2026-11-09",
+   "period_end": "2026-11-15"
   }
  ],
  "pending_transcripts": []
